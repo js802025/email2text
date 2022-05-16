@@ -7,11 +7,12 @@ import ssl
 from time import sleep
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+#from gmailbot import Gmailbot
 
 
 
 class TextBot():
-    def __init__(self, username, password, providerIMAP, providerSMTP, handle_messages=None):
+    def __init__(self, username, password, providerIMAP, providerSMTP, handle_messages=None, tokenPath=None):
         self.imap = imaplib.IMAP4_SSL(providerIMAP)
         self.imap.login(username, password)
         self.providerSMTP = providerSMTP
@@ -19,6 +20,7 @@ class TextBot():
         self.username = username
         self.password = password
         self.commands = []
+        
     def start(self):
         while True:
             self.imap.select("INBOX")

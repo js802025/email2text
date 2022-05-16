@@ -1,5 +1,7 @@
+README.md
 setup.py
 email2text/__init__.py
+email2text/gmailbot.py
 email2text.egg-info/PKG-INFO
 email2text.egg-info/SOURCES.txt
 email2text.egg-info/dependency_links.txt
