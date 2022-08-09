@@ -103,6 +103,56 @@ class Gmailbot():
         # pylint: disable=E1101
         response = self.service.users().settings().updateVacation(
             userId='me', body=vacation_settings).execute()
+
+    def watch(self, topic):
+        request = {
+            'labelIds': ['UNREAD'],
+            'topicName': topic
+        }
+        self.service.users().watch(userId='me', body=request).execute()
+    
+    def get_new_message(self, historyId):
+        # user_id =  'me'
+        # label_id_one = 'INBOX'
+        # label_id_two = 'UNREAD'
+        # try:
+        #         unread_msgs = self.service.users().messages().list(userId='me',labelIds=[label_id_one, label_id_two]).execute()
+        #        # print(unread_msgs)
+        #         msg_list = unread_msgs.get("messages")
+        #         if msg_list:
+        #             for msg in msg_list:
+        #                 txt = self.service.users().messages().get(userId='me', id=msg['id']).execute()
+        #                 payload = txt["payload"]
+        #                 headers = payload["headers"]
+        #                 self.service.users().messages().modify(userId='me', id=txt["id"], body={'removeLabelIds': ['UNREAD']}).execute()
+        #                 for h in headers:
+        #                     if h["name"] == "From":
+        #                         From = h["value"]
+        #                 if self.handle_messages:
+        #                     self.handle_messages(txt["snippet"], From)
+        #                 for command, func in self.commands:
+        #                     if command in payload.decode():
+        #                         func(payload.decode(), From)
+        #                         break
+        # except:
+        #     self.service = self.login()
+        #     sleep(5)
+        history = self.service.users().history().list(userId='me', startHistoryId=historyId).execute()["history"][0]
+        if len(history["messagesAdded"]) > 0:
+            for message in history["messagesAdded"]:
+                txt = self.service.users().messages().get(userId='me', id=message["message"]["id"]).execute()
+                payload = txt["payload"]
+                headers = payload["headers"]
+                self.service.users().messages().modify(userId='me', id=txt["id"], body={'removeLabelIds': ['UNREAD']}).execute()
+                for h in headers:
+                    if h["name"] == "From":
+                        From = h["value"]
+                if self.handle_messages:
+                    self.handle_messages(txt["snippet"], From)
+                for command, func in self.commands:
+                    if command in payload.decode():
+                        func(payload.decode(), From)
+                        break
         
     
 
